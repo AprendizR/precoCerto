@@ -38,7 +38,7 @@ public class InsumosService {
         return repository.findById(id).map(converter::paraDTO).orElseThrow(()-> new RuntimeException("Insumo não encontrado"));
     }
 
-    public InsumosDTOResponse atualizaInsumo(Long id, InsumosDTORequest dto){
+    public InsumosDTOResponse atualizarInsumo(Long id, InsumosDTORequest dto){
         InsumosEntity entity = repository.findById(id).orElseThrow(() -> new RuntimeException("Insumo não encontrado"));
         if (dto.nomeInsumo() != null){
             entity.setNomeInsumo(dto.nomeInsumo());

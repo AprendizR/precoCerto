@@ -4,8 +4,8 @@ import com.precocerto.backend.enums.UnidadeMedida;
 import lombok.Builder;
 
 @Builder
-public record InsumosDTORequest (
+public record InsumosDTORequest(
         String nomeInsumo,
         UnidadeMedida unidadeMedida
-)
-{}
+) {
+}

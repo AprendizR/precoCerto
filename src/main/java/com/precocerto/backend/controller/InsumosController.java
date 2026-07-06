@@ -32,7 +32,7 @@ public class InsumosController {
 
     @PutMapping ("/{id}")
     public ResponseEntity<InsumosDTOResponse> atualizarInsumo (@PathVariable Long id, @RequestBody InsumosDTORequest dto){
-        return ResponseEntity.ok(service.atualizaInsumo(id, dto));
+        return ResponseEntity.ok(service.atualizarInsumo(id, dto));
     }
 
     @DeleteMapping("/{id}")
