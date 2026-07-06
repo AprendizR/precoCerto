@@ -14,6 +14,7 @@ public class InsumosConverter {
                 .quantidadeAtual(entity.getQuantidadeAtual())
                 .unidadeMedida(entity.getUnidadeMedida())
                 .custoMedioUnitario(entity.getCustoMedioUnitario())
+                .dataCriacao(entity.getDataCriacao())
                 .build();
     }
 

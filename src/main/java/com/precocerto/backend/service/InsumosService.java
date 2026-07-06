@@ -3,12 +3,14 @@ package com.precocerto.backend.service;
 import com.precocerto.backend.converter.InsumosConverter;
 import com.precocerto.backend.dto.request.InsumosDTORequest;
 import com.precocerto.backend.dto.response.InsumosDTOResponse;
+import com.precocerto.backend.enums.Tipo;
 import com.precocerto.backend.infrastructure.entity.InsumosEntity;
 import com.precocerto.backend.infrastructure.exception.ConflictException;
 import com.precocerto.backend.infrastructure.repository.InsumosRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,6 +25,7 @@ public class InsumosService {
             throw new ConflictException("Insumo com esse nome já cadastrado");
         }
         InsumosEntity entity = converter.paraEntity(dto);
+        entity.setCustoMedioUnitario(0.0);
         InsumosEntity salvo = repository.save(entity);
         return converter.paraDTO(salvo);
     }

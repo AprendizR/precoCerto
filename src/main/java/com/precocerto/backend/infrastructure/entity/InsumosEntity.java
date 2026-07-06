@@ -30,7 +30,7 @@ public class InsumosEntity {
     private LocalDateTime dataCriacao;
 
     @PrePersist
-    public void prePersist(){
+    public void prePersist() {
         this.dataCriacao = LocalDateTime.now();
     }
 }
