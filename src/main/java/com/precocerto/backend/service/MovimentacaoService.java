@@ -30,11 +30,17 @@ public class MovimentacaoService {
         double preco = (dto.tipo() == Tipo.SAIDA) ? 0.0 : (dto.precoCompra() == null ? 0.0 : dto.precoCompra());
 
         if (dto.tipo() == Tipo.ENTRADA) {
-            double totalAtual = insumo.getQuantidadeAtual() * insumo.getCustoMedioUnitario();
-            double totalNovaCompra = dto.quantidade() * preco;
-            double novaQuantidade = insumo.getQuantidadeAtual() + dto.quantidade();
+            if (dto.quantidade() <= 0) {
+                throw new IllegalArgumentException("A quantidade deve ser maior que zero.");
+            }
 
-            insumo.setCustoMedioUnitario((totalAtual + totalNovaCompra) / novaQuantidade);
+            double totalAtual = insumo.getQuantidadeAtual() * insumo.getCustoMedioUnitario();
+            double novaQuantidade = insumo.getQuantidadeAtual() + dto.quantidade();
+            double precoCompra = (dto.precoCompra() != null) ? dto.precoCompra() : 0.0;
+            double novoCusto = (totalAtual + precoCompra) / novaQuantidade;
+            double custoArredondado = Math.round(novoCusto * 1_000_000.0) / 1_000_000.0;
+
+            insumo.setCustoMedioUnitario(custoArredondado);
             insumo.setQuantidadeAtual(novaQuantidade);
         } else {
             if (insumo.getQuantidadeAtual() < dto.quantidade()) {
