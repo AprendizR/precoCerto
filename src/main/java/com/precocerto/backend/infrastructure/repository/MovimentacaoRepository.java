@@ -13,4 +13,6 @@ public interface MovimentacaoRepository extends JpaRepository<MovimentacaoEntity
 
     @Query("SELECT m FROM MovimentacaoEntity m JOIN FETCH m.insumos WHERE m.id = :id")
     Optional<MovimentacaoEntity> findByIdWithInsumos(Long id);
+
+    List<MovimentacaoEntity> findByVendaId(Long vendaId);
 }

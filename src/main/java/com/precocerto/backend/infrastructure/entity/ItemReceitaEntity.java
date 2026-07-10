@@ -10,7 +10,6 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-
 public class ItemReceitaEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
