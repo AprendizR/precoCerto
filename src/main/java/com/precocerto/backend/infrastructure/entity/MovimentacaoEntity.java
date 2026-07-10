@@ -22,6 +22,10 @@ public class MovimentacaoEntity {
     @JoinColumn(name = "insumos_id")
     private InsumosEntity insumos;
 
+    @ManyToOne
+    @JoinColumn(name = "venda_id")
+    private VendaEntity venda;
+
     private Tipo tipo;
 
     private Double quantidade;

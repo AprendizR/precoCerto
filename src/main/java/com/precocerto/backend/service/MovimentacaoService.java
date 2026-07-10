@@ -6,7 +6,9 @@ import com.precocerto.backend.dto.request.MovimentacaoDTORequest;
 import com.precocerto.backend.dto.response.MovimentacaoDTOResponse;
 import com.precocerto.backend.enums.Tipo;
 import com.precocerto.backend.infrastructure.entity.InsumosEntity;
+import com.precocerto.backend.infrastructure.entity.ItemReceitaEntity;
 import com.precocerto.backend.infrastructure.entity.MovimentacaoEntity;
+import com.precocerto.backend.infrastructure.entity.VendaEntity;
 import com.precocerto.backend.infrastructure.exception.ConflictException;
 import com.precocerto.backend.infrastructure.repository.InsumosRepository;
 import com.precocerto.backend.infrastructure.repository.MovimentacaoRepository;
@@ -68,6 +70,7 @@ public class MovimentacaoService {
         return repository.findByIdWithInsumos(id).map(converter::paraDTO).orElseThrow(() -> new RuntimeException("Movimentação não encotrada"));
     }
 
+    @Transactional
     public void estornarMovimentacao(Long id) {
         MovimentacaoEntity original = repository.findByIdWithInsumos(id).orElseThrow(() -> new RuntimeException("Movimentação não encontrada"));
 
@@ -81,6 +84,25 @@ public class MovimentacaoService {
         );
 
         criarMovimentacao(estorno);
+    }
+
+    @Transactional
+    public void registrarBaixaReceita(List<ItemReceitaEntity> itens, VendaEntity venda) {
+        itens.forEach(item -> {
+            MovimentacaoEntity mov = MovimentacaoEntity.builder()
+                    .insumos(item.getInsumos())
+                    .venda(venda)
+                    .tipo(Tipo.SAIDA)
+                    .quantidade(item.getQuantidadeUsada())
+                    .precoCompra(0.0)
+                    .build();
+
+            repository.save(mov);
+
+            InsumosEntity insumo = item.getInsumos();
+            insumo.setQuantidadeAtual(insumo.getQuantidadeAtual() - item.getQuantidadeUsada());
+            insumosRepository.save(insumo);
+        });
     }
 
 }
