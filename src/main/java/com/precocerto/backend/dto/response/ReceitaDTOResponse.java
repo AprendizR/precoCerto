@@ -11,6 +11,8 @@ public record ReceitaDTOResponse(
         Double tempoGas,
         Double tempoEnergia,
         Double custoTotal,
+        Double margemLucro,
+        Double precoSugerido,
         List<ItemReceitaDTOResponse> itensReceita
 ) {
 }

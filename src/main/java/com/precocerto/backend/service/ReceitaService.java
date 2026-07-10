@@ -53,6 +53,7 @@ public class ReceitaService {
         if (dto.nomeReceita() != null) entity.setNomeReceita(dto.nomeReceita());
         if (dto.tempoGas() != null) entity.setTempoGas(dto.tempoGas());
         if (dto.tempoEnergia() != null) entity.setTempoEnergia(dto.tempoEnergia());
+        if (dto.margemLucro() != null) entity.setMargemLucro(dto.margemLucro());
         if (dto.itensReceita() != null) {
             entity.getItensReceita().clear();
             List<ItemReceitaEntity> novosItens = criarItensReceita(entity, dto.itensReceita());
@@ -60,7 +61,6 @@ public class ReceitaService {
         }
         calcularCusto(entity);
         return converter.paraDTO(repository.save(entity));
-
     }
 
     @Transactional
@@ -80,6 +80,8 @@ public class ReceitaService {
                 .sum();
 
         entity.setCustoTotal(custoGas + custoEnergia + custoIngredientes);
+
+        calcularPrecoSugerido(entity);
     }
 
     private List<ItemReceitaEntity> criarItensReceita(ReceitaEntity entity, List<ItemReceitaDTORequest> itensDto) {
@@ -93,6 +95,13 @@ public class ReceitaService {
                     .quantidadeUsada(itemDto.quantidadeUsada())
                     .build();
         }).collect(Collectors.toList());
+    }
+
+    private void calcularPrecoSugerido(ReceitaEntity entity) {
+        double valorInput = (entity.getMargemLucro() == null || entity.getMargemLucro() <= 0) ? 100.0 : entity.getMargemLucro();
+        double margemDecimal = valorInput / 100.0;
+        double preco = entity.getCustoTotal() * (1 + margemDecimal);
+        entity.setPrecoSugerido(Math.round(preco * 100.0) / 100.0);
     }
 }
 
