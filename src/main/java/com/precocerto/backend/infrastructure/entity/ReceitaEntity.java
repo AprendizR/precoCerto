@@ -25,6 +25,10 @@ public class ReceitaEntity {
 
     private Double custoTotal;
 
+    private Double margemLucro;
+
+    private Double precoSugerido;
+
     @OneToMany(mappedBy = "receita", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ItemReceitaEntity> itensReceita;
 }

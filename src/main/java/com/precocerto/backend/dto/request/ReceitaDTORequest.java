@@ -8,6 +8,7 @@ public record ReceitaDTORequest (
         String nomeReceita,
         Double tempoGas,
         Double tempoEnergia,
+        Double margemLucro,
         List<ItemReceitaDTORequest> itensReceita
 ) {
 }
