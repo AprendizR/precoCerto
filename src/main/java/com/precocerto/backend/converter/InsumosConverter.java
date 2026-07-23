@@ -3,9 +3,14 @@ package com.precocerto.backend.converter;
 import com.precocerto.backend.dto.request.InsumosDTORequest;
 import com.precocerto.backend.dto.response.InsumosDTOResponse;
 import com.precocerto.backend.infrastructure.entity.InsumosEntity;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.time.Clock;
+import java.time.LocalDateTime;
+
 @Component
+@RequiredArgsConstructor
 public class InsumosConverter {
     public InsumosDTOResponse paraDTO(InsumosEntity entity){
         return InsumosDTOResponse.builder()
@@ -14,7 +19,7 @@ public class InsumosConverter {
                 .quantidadeAtual(entity.getQuantidadeAtual())
                 .unidadeMedida(entity.getUnidadeMedida())
                 .custoMedioUnitario(entity.getCustoMedioUnitario())
-                .dataCriacao(entity.getDataCriacao())
+                .dataCriacao(LocalDateTime.now())
                 .build();
     }
 
@@ -22,7 +27,7 @@ public class InsumosConverter {
         return InsumosEntity.builder()
                 .nomeInsumo(dtoRequest.nomeInsumo())
                 .unidadeMedida(dtoRequest.unidadeMedida())
-                .quantidadeAtual(0.0)
+                .dataCriacao(LocalDateTime.now())
                 .build();
     }
 }

@@ -122,15 +122,15 @@ Este projeto está sendo desenvolvido com foco em **excelência técnica**, **cl
 
 - [✅] Setup do ambiente backend
 
-- [ ] Setup do ambiente front
+- [✅] Setup do ambiente front
 
 - [✅] Banco de dados
 
-- [ ] Pipeline de CI/CD configurado
+- [✅] Pipeline de CI/CD configurado
 
-- [ ] Desenvolvimento do MVP (insumos + produtos + precificação)
+- [✅] Desenvolvimento do MVP (insumos + produtos + precificação)
 
-- [ ] Fase 2 (despesas fixas + rateio)
+- [✅] Fase 2 (despesas fixas + rateio)
 
 - [ ] Fase 3 (DRE + exportações)
 
@@ -150,6 +150,13 @@ Este projeto está sendo desenvolvido com foco em **excelência técnica**, **cl
 
 - **Fase 3 (Visão Gerencial):** Implementação do DREService para cruzamento de dados de Venda vs Custos.
 
+
+
+---
+
+## ⚙️ Confira o Frontend em:
+
+- **https://github.com/AprendizR/precoCertoFront**
 
 
 ---

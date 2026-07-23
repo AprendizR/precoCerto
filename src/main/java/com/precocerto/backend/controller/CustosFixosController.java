@@ -2,7 +2,6 @@ package com.precocerto.backend.controller;
 
 import com.precocerto.backend.dto.request.CustosFixosDTORequest;
 import com.precocerto.backend.dto.response.CustosFixosDTOResponse;
-import com.precocerto.backend.infrastructure.entity.CustosFixosEntity;
 import com.precocerto.backend.service.CustosFixosService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +12,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/custos")
+@CrossOrigin(origins = "http://localhost:5173")
 public class CustosFixosController {
     private final CustosFixosService service;
 
