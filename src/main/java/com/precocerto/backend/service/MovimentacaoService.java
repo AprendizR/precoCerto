@@ -28,18 +28,26 @@ public class MovimentacaoService {
 
     @Transactional
     public MovimentacaoDTOResponse criarMovimentacao(MovimentacaoDTORequest dto) {
-        InsumosEntity insumo = insumosRepository.findById(dto.insumo().id()).orElseThrow(() -> new RuntimeException("Insumo não encontrado"));
-        double preco = (dto.tipo() == Tipo.SAIDA) ? 0.0 : (dto.precoCompra() == null ? 0.0 : dto.precoCompra());
+        InsumosEntity insumo = insumosRepository.findById(dto.insumo().id())
+                .orElseThrow(() -> new RuntimeException("Insumo não encontrado"));
+
+        double valorTotalCompra = (dto.precoCompra() != null) ? dto.precoCompra() : 0.0;
+        double precoUnitarioCalculado = 0.0;
 
         if (dto.tipo() == Tipo.ENTRADA) {
             if (dto.quantidade() <= 0) {
                 throw new IllegalArgumentException("A quantidade deve ser maior que zero.");
             }
 
+            if (dto.quantidade() > 0) {
+                double bruto = valorTotalCompra / dto.quantidade();
+                precoUnitarioCalculado = Math.round(bruto * 10_000.0) / 10_000.0;
+            }
+
             double totalAtual = insumo.getQuantidadeAtual() * insumo.getCustoMedioUnitario();
             double novaQuantidade = insumo.getQuantidadeAtual() + dto.quantidade();
-            double precoCompra = (dto.precoCompra() != null) ? dto.precoCompra() : 0.0;
-            double novoCusto = (totalAtual + precoCompra) / novaQuantidade;
+
+            double novoCusto = (totalAtual + valorTotalCompra) / novaQuantidade;
             double custoArredondado = Math.round(novoCusto * 1_000_000.0) / 1_000_000.0;
 
             insumo.setCustoMedioUnitario(custoArredondado);
@@ -49,12 +57,15 @@ public class MovimentacaoService {
                 throw new ConflictException("Quantia insuficiente");
             }
             insumo.setQuantidadeAtual(insumo.getQuantidadeAtual() - dto.quantidade());
+
+
+            precoUnitarioCalculado = insumo.getCustoMedioUnitario();
         }
 
         insumosRepository.save(insumo);
 
         MovimentacaoEntity entity = converter.paraEntity(dto);
-        entity.setPrecoCompra(preco);
+        entity.setPrecoCompra(precoUnitarioCalculado);
         entity.setInsumos(insumo);
         return converter.paraDTO(repository.save(entity));
     }
@@ -67,7 +78,9 @@ public class MovimentacaoService {
     }
 
     public MovimentacaoDTOResponse buscarMovimentacao(Long id) {
-        return repository.findByIdWithInsumos(id).map(converter::paraDTO).orElseThrow(() -> new RuntimeException("Movimentação não encotrada"));
+        return repository.findByIdWithInsumos(id)
+                .map(converter::paraDTO)
+                .orElseThrow(() -> new RuntimeException("Movimentacao nao encontrada"));
     }
 
     @Transactional
@@ -104,5 +117,4 @@ public class MovimentacaoService {
             insumosRepository.save(insumo);
         });
     }
-
 }

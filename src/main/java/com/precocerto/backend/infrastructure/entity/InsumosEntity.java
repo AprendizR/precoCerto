@@ -20,10 +20,12 @@ public class InsumosEntity {
 
     private String nomeInsumo;
 
+    @Builder.Default
     private Double quantidadeAtual = 0.0;
 
     private UnidadeMedida unidadeMedida;
 
+    @Builder.Default
     private Double custoMedioUnitario = 0.0;
 
     private LocalDateTime dataCriacao;
