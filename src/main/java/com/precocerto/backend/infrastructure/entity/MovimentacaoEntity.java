@@ -26,11 +26,17 @@ public class MovimentacaoEntity {
     @JoinColumn(name = "venda_id")
     private VendaEntity venda;
 
+    @OneToOne(mappedBy = "movimentacao")
+    private CompraEntity compra;
+
     private Tipo tipo;
 
     private Double quantidade;
 
     private Double precoCompra;
+
+    @Builder.Default
+    private Boolean estorno = false;
 
     private LocalDateTime dataMovimentacao;
 

@@ -8,6 +8,7 @@ import com.precocerto.backend.infrastructure.entity.CustosFixosEntity;
 import com.precocerto.backend.infrastructure.entity.InsumosEntity;
 import com.precocerto.backend.infrastructure.entity.ItemReceitaEntity;
 import com.precocerto.backend.infrastructure.entity.ReceitaEntity;
+import com.precocerto.backend.infrastructure.exception.ConflictException;
 import com.precocerto.backend.infrastructure.repository.CustosFixosRepository;
 import com.precocerto.backend.infrastructure.repository.InsumosRepository;
 import com.precocerto.backend.infrastructure.repository.ReceitaRepository;
@@ -15,7 +16,9 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,7 +31,13 @@ public class ReceitaService {
 
     @Transactional
     public ReceitaDTOResponse adicionarReceita(ReceitaDTORequest dto) {
+        String nomeNormalizado = normalizarTexto(dto.nomeReceita());
+        if (repository.existsByNomeReceitaIgnoreCase(nomeNormalizado)) {
+            throw new ConflictException("Receita com esse nome ja cadastrada");
+        }
+
         ReceitaEntity entity = converter.paraEntity(dto);
+        entity.setNomeReceita(nomeNormalizado);
         entity.setItensReceita(criarItensReceita(entity, dto.itensReceita()));
         calcularCusto(entity);
         return converter.paraDTO(repository.save(entity));
@@ -44,13 +53,24 @@ public class ReceitaService {
 
     @Transactional
     public ReceitaDTOResponse buscarUmaReceita(Long id) {
-        return repository.findById(id).map(converter::paraDTO).orElseThrow(() -> new RuntimeException("Receita não encontrada"));
+        return repository.findById(id)
+                .map(converter::paraDTO)
+                .orElseThrow(() -> new RuntimeException("Receita nao encontrada"));
     }
 
     @Transactional
     public ReceitaDTOResponse atualizarReceita(Long id, ReceitaDTORequest dto) {
-        ReceitaEntity entity = repository.findById(id).orElseThrow(() -> new RuntimeException("Receita não encontrada"));
-        if (dto.nomeReceita() != null) entity.setNomeReceita(dto.nomeReceita());
+        ReceitaEntity entity = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Receita nao encontrada"));
+
+        if (dto.nomeReceita() != null) {
+            String nomeNormalizado = normalizarTexto(dto.nomeReceita());
+            if (!nomeNormalizado.equalsIgnoreCase(entity.getNomeReceita()) && repository.existsByNomeReceitaIgnoreCase(nomeNormalizado)) {
+                throw new ConflictException("Receita com esse nome ja cadastrada");
+            }
+            entity.setNomeReceita(nomeNormalizado);
+        }
+
         if (dto.tempoGas() != null) entity.setTempoGas(dto.tempoGas());
         if (dto.tempoEnergia() != null) entity.setTempoEnergia(dto.tempoEnergia());
         if (dto.margemLucro() != null) entity.setMargemLucro(dto.margemLucro());
@@ -59,6 +79,7 @@ public class ReceitaService {
             List<ItemReceitaEntity> novosItens = criarItensReceita(entity, dto.itensReceita());
             entity.getItensReceita().addAll(novosItens);
         }
+
         calcularCusto(entity);
         return converter.paraDTO(repository.save(entity));
     }
@@ -71,7 +92,7 @@ public class ReceitaService {
 
     private void calcularCusto(ReceitaEntity entity) {
         CustosFixosEntity custos = custosFixosRepository.findAll().stream().findFirst().orElseThrow(() ->
-                new RuntimeException("Custos fixos não configurados"));
+                new RuntimeException("Custos fixos nao configurados"));
         Double custoGas = entity.getTempoGas() * custos.getCustoPorMinutoGas();
         Double custoEnergia = entity.getTempoEnergia() * custos.getCustoPorMinutoEnergia();
 
@@ -80,21 +101,23 @@ public class ReceitaService {
                 .sum();
 
         entity.setCustoTotal(custoGas + custoEnergia + custoIngredientes);
-
         calcularPrecoSugerido(entity);
     }
 
     private List<ItemReceitaEntity> criarItensReceita(ReceitaEntity entity, List<ItemReceitaDTORequest> itensDto) {
-        return itensDto.stream().map(itemDto -> {
-            InsumosEntity insumo = insumosRepository.findById(itemDto.insumoId()).orElseThrow(() ->
-                    new RuntimeException("Insumo não encontrado: " + itemDto.insumoId()));
+        return (itensDto == null ? Collections.<ItemReceitaDTORequest>emptyList() : itensDto)
+                .stream()
+                .map(itemDto -> {
+                    InsumosEntity insumo = insumosRepository.findById(itemDto.insumoId()).orElseThrow(() ->
+                            new RuntimeException("Insumo nao encontrado: " + itemDto.insumoId()));
 
-            return ItemReceitaEntity.builder()
-                    .receita(entity)
-                    .insumos(insumo)
-                    .quantidadeUsada(itemDto.quantidadeUsada())
-                    .build();
-        }).collect(Collectors.toList());
+                    return ItemReceitaEntity.builder()
+                            .receita(entity)
+                            .insumos(insumo)
+                            .quantidadeUsada(itemDto.quantidadeUsada())
+                            .build();
+                })
+                .collect(Collectors.toList());
     }
 
     private void calcularPrecoSugerido(ReceitaEntity entity) {
@@ -103,5 +126,8 @@ public class ReceitaService {
         double preco = entity.getCustoTotal() * (1 + margemDecimal);
         entity.setPrecoSugerido(Math.round(preco * 100.0) / 100.0);
     }
-}
 
+    private String normalizarTexto(String valor) {
+        return valor == null ? null : valor.trim().toUpperCase(Locale.ROOT);
+    }
+}

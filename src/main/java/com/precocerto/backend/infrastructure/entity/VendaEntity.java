@@ -29,10 +29,14 @@ public class VendaEntity {
 
     private LocalDateTime dataVenda;
 
+    @Builder.Default
     private StatusVenda status = StatusVenda.CONCLUIDA;
 
     @PrePersist
     private void prePersist(){
         this.dataVenda = LocalDateTime.now();
+        if (this.status == null) {
+            this.status = StatusVenda.CONCLUIDA;
+        }
     }
 }

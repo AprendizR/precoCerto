@@ -11,10 +11,12 @@ public class MovimentacaoConverter {
         return MovimentacaoDTOResponse.builder()
                 .id(entity.getId())
                 .insumo(entity.getInsumos())
+                .compraId(entity.getCompra() == null ? null : entity.getCompra().getId())
                 .tipo(entity.getTipo())
                 .quantidade(entity.getQuantidade())
                 .precoCompra(entity.getPrecoCompra())
                 .dataMovimentacao(entity.getDataMovimentacao())
+                .estorno(entity.getEstorno())
                 .build();
     }
 
@@ -23,6 +25,7 @@ public class MovimentacaoConverter {
                 .tipo(dto.tipo())
                 .quantidade(dto.quantidade())
                 .precoCompra(dto.precoCompra())
+                .estorno(false)
                 .build();
     }
 }
