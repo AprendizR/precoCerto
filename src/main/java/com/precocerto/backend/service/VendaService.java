@@ -3,6 +3,7 @@ package com.precocerto.backend.service;
 import com.precocerto.backend.converter.VendaConverter;
 import com.precocerto.backend.dto.request.VendaDTORequest;
 import com.precocerto.backend.dto.response.VendaDTOResponse;
+import com.precocerto.backend.enums.FormaPagamento;
 import com.precocerto.backend.enums.StatusVenda;
 import com.precocerto.backend.infrastructure.entity.MovimentacaoEntity;
 import com.precocerto.backend.infrastructure.entity.ReceitaEntity;
@@ -31,6 +32,13 @@ public class VendaService {
         ReceitaEntity receita = receitaRepository.findById(dto.receitaId()).orElseThrow(() ->
                 new RuntimeException("Receita não encontrada"));
         VendaEntity entity = converter.paraEntityReceita(dto, receita);
+        if (entity.getFormaPagamento() == FormaPagamento.PIX || entity.getFormaPagamento() == FormaPagamento.DINHEIRO) {
+            entity.setPrecoVenda(entity.getPrecoVenda());
+        } else if (entity.getFormaPagamento() == FormaPagamento.DEBITO) {
+            entity.setPrecoVenda(entity.getPrecoVenda() - (entity.getPrecoVenda() * 0.0075));
+        } else {
+            entity.setPrecoVenda(entity.getPrecoVenda() - (entity.getPrecoVenda() * 0.0269));
+        }
         VendaEntity vendaSalva = repository.save(entity);
 
         movimentacaoService.registrarBaixaReceita(receita.getItensReceita(), vendaSalva);
