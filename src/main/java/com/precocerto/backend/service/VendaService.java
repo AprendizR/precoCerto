@@ -37,7 +37,7 @@ public class VendaService {
         } else if (entity.getFormaPagamento() == FormaPagamento.DEBITO) {
             entity.setPrecoVenda(entity.getPrecoVenda() - (entity.getPrecoVenda() * 0.0075));
         } else {
-            entity.setPrecoVenda(entity.getPrecoVenda() - (entity.getPrecoVenda() * 0.0268));
+            entity.setPrecoVenda(entity.getPrecoVenda() - (entity.getPrecoVenda() * 0.0269));
         }
         VendaEntity vendaSalva = repository.save(entity);
 
