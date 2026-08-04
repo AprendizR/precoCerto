@@ -1,11 +1,15 @@
 package com.precocerto.backend.converter;
 
 import com.precocerto.backend.dto.request.ReceitaDTORequest;
+import com.precocerto.backend.dto.request.ItemReceitaDTORequest;
 import com.precocerto.backend.dto.response.ReceitaDTOResponse;
+import com.precocerto.backend.infrastructure.entity.ItemReceitaEntity;
 import com.precocerto.backend.infrastructure.entity.ReceitaEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 @Component
@@ -22,7 +26,7 @@ public class ReceitaConverter {
                 .custoTotal(entity.getCustoTotal())
                 .margemLucro(entity.getMargemLucro() != null ? entity.getMargemLucro() : 100.0)
                 .precoSugerido(entity.getPrecoSugerido())
-                .itensReceita(entity.getItensReceita()
+                .itensReceita((entity.getItensReceita() == null ? Collections.<ItemReceitaEntity>emptyList() : entity.getItensReceita())
                         .stream()
                         .map(itemReceitaConverter::paraDTO)
                         .collect(Collectors.toList()))
@@ -31,14 +35,18 @@ public class ReceitaConverter {
 
     public ReceitaEntity paraEntity(ReceitaDTORequest dto) {
         return ReceitaEntity.builder()
-                .nomeReceita(dto.nomeReceita())
+                .nomeReceita(normalizarTexto(dto.nomeReceita()))
                 .tempoGas(dto.tempoGas())
                 .tempoEnergia(dto.tempoEnergia())
                 .margemLucro(dto.margemLucro())
-                .itensReceita(dto.itensReceita()
+                .itensReceita((dto.itensReceita() == null ? Collections.<ItemReceitaDTORequest>emptyList() : dto.itensReceita())
                         .stream()
                         .map(itemReceitaConverter::paraEntity)
                         .collect(Collectors.toList()))
                 .build();
+    }
+
+    private String normalizarTexto(String valor) {
+        return valor == null ? null : valor.trim().toUpperCase(Locale.ROOT);
     }
 }

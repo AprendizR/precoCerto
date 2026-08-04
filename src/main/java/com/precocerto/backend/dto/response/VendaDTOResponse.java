@@ -1,7 +1,7 @@
 package com.precocerto.backend.dto.response;
 
 import com.precocerto.backend.enums.FormaPagamento;
-import com.precocerto.backend.infrastructure.entity.ReceitaEntity;
+import com.precocerto.backend.enums.StatusVenda;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
@@ -12,6 +12,7 @@ public record VendaDTOResponse(
         String nomeReceita,
         FormaPagamento formaPagamento,
         Double precoVenda,
-        LocalDateTime dataVenda
+        LocalDateTime dataVenda,
+        StatusVenda status
 ) {
 }

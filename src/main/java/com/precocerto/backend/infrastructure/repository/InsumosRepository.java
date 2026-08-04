@@ -5,4 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface InsumosRepository extends JpaRepository<InsumosEntity, Long> {
     boolean existsByNomeInsumo(String nome);
+    boolean existsByNomeInsumoIgnoreCase(String nome);
 }

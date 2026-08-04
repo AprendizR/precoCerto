@@ -6,28 +6,30 @@ import com.precocerto.backend.infrastructure.entity.InsumosEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.time.Clock;
-import java.time.LocalDateTime;
+import java.util.Locale;
 
 @Component
 @RequiredArgsConstructor
 public class InsumosConverter {
-    public InsumosDTOResponse paraDTO(InsumosEntity entity){
+    public InsumosDTOResponse paraDTO(InsumosEntity entity) {
         return InsumosDTOResponse.builder()
                 .id(entity.getId())
                 .nomeInsumo(entity.getNomeInsumo())
                 .quantidadeAtual(entity.getQuantidadeAtual())
                 .unidadeMedida(entity.getUnidadeMedida())
                 .custoMedioUnitario(entity.getCustoMedioUnitario())
-                .dataCriacao(LocalDateTime.now())
+                .dataCriacao(entity.getDataCriacao())
                 .build();
     }
 
-    public InsumosEntity paraEntity(InsumosDTORequest dtoRequest){
+    public InsumosEntity paraEntity(InsumosDTORequest dtoRequest) {
         return InsumosEntity.builder()
-                .nomeInsumo(dtoRequest.nomeInsumo())
+                .nomeInsumo(normalizarTexto(dtoRequest.nomeInsumo()))
                 .unidadeMedida(dtoRequest.unidadeMedida())
-                .dataCriacao(LocalDateTime.now())
                 .build();
+    }
+
+    private String normalizarTexto(String valor) {
+        return valor == null ? null : valor.trim().toUpperCase(Locale.ROOT);
     }
 }

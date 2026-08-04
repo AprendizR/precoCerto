@@ -10,9 +10,11 @@ import java.time.LocalDateTime;
 public record MovimentacaoDTOResponse(
         Long id,
         InsumosEntity insumo,
+        Long compraId,
         Tipo tipo,
         Double quantidade,
         Double precoCompra,
-        LocalDateTime dataMovimentacao
+        LocalDateTime dataMovimentacao,
+        Boolean estorno
 ) {
 }

@@ -11,7 +11,8 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/receita")
+@RequestMapping("/api/receitas")
+@CrossOrigin(origins = "http://localhost:5173")
 public class ReceitaController {
     private final ReceitaService service;
 
