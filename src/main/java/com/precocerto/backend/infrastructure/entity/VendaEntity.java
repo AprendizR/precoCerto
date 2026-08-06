@@ -29,6 +29,8 @@ public class VendaEntity {
 
     private LocalDateTime dataVenda;
 
+    private Double quantidadeVendida;
+
     @Builder.Default
     private StatusVenda status = StatusVenda.CONCLUIDA;
 

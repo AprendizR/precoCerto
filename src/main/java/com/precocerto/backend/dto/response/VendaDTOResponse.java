@@ -12,6 +12,7 @@ public record VendaDTOResponse(
         String nomeReceita,
         FormaPagamento formaPagamento,
         Double precoVenda,
+        Double quantidadeVendida,
         LocalDateTime dataVenda,
         StatusVenda status
 ) {

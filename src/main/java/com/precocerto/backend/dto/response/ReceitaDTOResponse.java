@@ -1,5 +1,6 @@
 package com.precocerto.backend.dto.response;
 
+import com.precocerto.backend.enums.RendimentoReceita;
 import lombok.Builder;
 
 import java.util.List;
@@ -13,6 +14,8 @@ public record ReceitaDTOResponse(
         Double custoTotal,
         Double margemLucro,
         Double precoSugerido,
+        RendimentoReceita rendimentoReceita,
+        Double quantidadeRendimento,
         List<ItemReceitaDTOResponse> itensReceita
 ) {
 }

@@ -4,6 +4,7 @@ import com.precocerto.backend.converter.ReceitaConverter;
 import com.precocerto.backend.dto.request.ItemReceitaDTORequest;
 import com.precocerto.backend.dto.request.ReceitaDTORequest;
 import com.precocerto.backend.dto.response.ReceitaDTOResponse;
+import com.precocerto.backend.enums.RendimentoReceita;
 import com.precocerto.backend.infrastructure.entity.CustosFixosEntity;
 import com.precocerto.backend.infrastructure.entity.InsumosEntity;
 import com.precocerto.backend.infrastructure.entity.ItemReceitaEntity;
@@ -74,6 +75,8 @@ public class ReceitaService {
         if (dto.tempoGas() != null) entity.setTempoGas(dto.tempoGas());
         if (dto.tempoEnergia() != null) entity.setTempoEnergia(dto.tempoEnergia());
         if (dto.margemLucro() != null) entity.setMargemLucro(dto.margemLucro());
+        if (dto.rendimentoReceita() != null) entity.setRendimentoReceita(dto.rendimentoReceita());
+        if (dto.quantidadeRendimento() != null) entity.setQuantidadeRendimento(dto.quantidadeRendimento());
         if (dto.itensReceita() != null) {
             entity.getItensReceita().clear();
             List<ItemReceitaEntity> novosItens = criarItensReceita(entity, dto.itensReceita());
@@ -91,6 +94,8 @@ public class ReceitaService {
     }
 
     private void calcularCusto(ReceitaEntity entity) {
+        validarRendimento(entity);
+
         CustosFixosEntity custos = custosFixosRepository.findAll().stream().findFirst().orElseThrow(() ->
                 new RuntimeException("Custos fixos nao configurados"));
         Double custoGas = entity.getTempoGas() * custos.getCustoPorMinutoGas();
@@ -123,8 +128,19 @@ public class ReceitaService {
     private void calcularPrecoSugerido(ReceitaEntity entity) {
         double valorInput = (entity.getMargemLucro() == null || entity.getMargemLucro() <= 0) ? 100.0 : entity.getMargemLucro();
         double margemDecimal = valorInput / 100.0;
-        double preco = entity.getCustoTotal() * (1 + margemDecimal);
+        double unidadeReferencia = entity.getRendimentoReceita() == RendimentoReceita.FATIA ? 1.0 : 500.0;
+        double fatorReferencia = unidadeReferencia / entity.getQuantidadeRendimento();
+        double preco = entity.getCustoTotal() * fatorReferencia * (1 + margemDecimal);
         entity.setPrecoSugerido(Math.round(preco * 100.0) / 100.0);
+    }
+
+    private void validarRendimento(ReceitaEntity entity) {
+        if (entity.getRendimentoReceita() == null) {
+            throw new IllegalArgumentException("Informe se a receita rende em gramas ou fatias.");
+        }
+        if (entity.getQuantidadeRendimento() == null || entity.getQuantidadeRendimento() <= 0) {
+            throw new IllegalArgumentException("A quantidade de rendimento deve ser maior que zero.");
+        }
     }
 
     private String normalizarTexto(String valor) {

@@ -7,6 +7,7 @@ import lombok.Builder;
 public record VendaDTORequest(
         Long receitaId,
         FormaPagamento formaPagamento,
-        Double precoVenda
+        Double precoVenda,
+        Double quantidadeVendida
 ) {
 }

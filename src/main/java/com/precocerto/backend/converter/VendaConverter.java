@@ -15,6 +15,7 @@ public class VendaConverter {
                 .nomeReceita(entity.getReceita().getNomeReceita())
                 .formaPagamento(entity.getFormaPagamento())
                 .precoVenda(entity.getPrecoVenda())
+                .quantidadeVendida(entity.getQuantidadeVendida())
                 .dataVenda(entity.getDataVenda())
                 .status(entity.getStatus())
                 .build();
@@ -24,6 +25,7 @@ public class VendaConverter {
         return VendaEntity.builder()
                 .formaPagamento(dto.formaPagamento())
                 .precoVenda(dto.precoVenda())
+                .quantidadeVendida(dto.quantidadeVendida())
                 .status(StatusVenda.CONCLUIDA)
                 .build();
     }
@@ -33,6 +35,7 @@ public class VendaConverter {
                 .receita(receita)
                 .formaPagamento(dto.formaPagamento())
                 .precoVenda(dto.precoVenda())
+                .quantidadeVendida(dto.quantidadeVendida())
                 .status(StatusVenda.CONCLUIDA)
                 .build();
     }

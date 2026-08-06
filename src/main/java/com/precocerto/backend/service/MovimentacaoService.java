@@ -100,20 +100,25 @@ public class MovimentacaoService {
     }
 
     @Transactional
-    public void registrarBaixaReceita(List<ItemReceitaEntity> itens, VendaEntity venda) {
+    public void registrarBaixaReceita(List<ItemReceitaEntity> itens, VendaEntity venda, double fatorRendimento) {
         itens.forEach(item -> {
+            double quantidadeBaixa = Math.round((item.getQuantidadeUsada() * fatorRendimento) * 1_000_000.0) / 1_000_000.0;
+            if (item.getInsumos().getQuantidadeAtual() < quantidadeBaixa) {
+                throw new ConflictException("Quantia insuficiente");
+            }
+
             MovimentacaoEntity mov = MovimentacaoEntity.builder()
                     .insumos(item.getInsumos())
                     .venda(venda)
                     .tipo(Tipo.SAIDA)
-                    .quantidade(item.getQuantidadeUsada())
-                    .precoCompra(0.0)
+                    .quantidade(quantidadeBaixa)
+                    .precoCompra(item.getInsumos().getCustoMedioUnitario())
                     .build();
 
             repository.save(mov);
 
             InsumosEntity insumo = item.getInsumos();
-            insumo.setQuantidadeAtual(insumo.getQuantidadeAtual() - item.getQuantidadeUsada());
+            insumo.setQuantidadeAtual(insumo.getQuantidadeAtual() - quantidadeBaixa);
             insumosRepository.save(insumo);
         });
     }

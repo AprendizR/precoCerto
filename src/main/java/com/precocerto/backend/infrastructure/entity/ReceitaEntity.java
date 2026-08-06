@@ -1,5 +1,6 @@
 package com.precocerto.backend.infrastructure.entity;
 
+import com.precocerto.backend.enums.RendimentoReceita;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -26,6 +27,10 @@ public class ReceitaEntity {
     private Double custoTotal;
 
     private Double margemLucro;
+
+    private RendimentoReceita rendimentoReceita;
+
+    private Double quantidadeRendimento;
 
     private Double precoSugerido;
 
